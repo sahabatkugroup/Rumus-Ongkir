@@ -1,573 +1,440 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Ongkir Realtime - Profesional</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEK ONGKIR - SAHABATKU DELIVERY</title>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
-    <style>
-        /* --- VARIABEL WARNA PROFESIONAL --- */
-        :root {
-            --primary: #0080f7; /* Biru Terang yang Kuat */
-            --primary-dark: #0b4870;
-            --text-primary: #1F2937;
-            --text-secondary: #6B7280;
-            --card-bg: #ffffff;
-            --border-light: #E5E7EB;
-            --shadow-subtle: 0 4px 10px rgba(0,0,0,0.08);
-            --shadow-strong: 0 10px 25px rgba(0, 202, 255, 0.2);
-            --success: #10B981;
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+          colors: { sahabatku: '#0080f7', darkBg: '#0f172a' },
+          borderRadius: { '2xl': '24px' }
         }
+      }
+    }
+  </script>
 
-        /* --- TATA LETAK UTAMA (RESPONSIVE) --- */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--primary), #00A9E0);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-            position: relative; 
-        }
-
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-strong);
-            text-align: center;
-            animation: fadeIn 0.6s ease-in-out;
-            position: relative; 
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            margin-bottom: 25px;
-            color: var(--primary-dark);
-            font-size: 1.6rem;
-            font-weight: 800;
-        }
-
-        /* --- TOMBOL KEMBALI DI POJOK KANAN ATAS --- */
-        .back-to-index {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            box-shadow: var(--shadow-subtle);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            z-index: 20; 
-        }
-
-        .back-to-index:hover {
-            background: var(--card-bg);
-            color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0, 202, 255, 0.3);
-            transform: translateY(-2px); /* Animasi naik sedikit */
-        }
-        
-        .back-to-index svg {
-            margin-right: 5px;
-            width: 14px;
-            height: 14px;
-            transition: transform 0.3s;
-        }
-        
-        .back-to-index:hover svg {
-            transform: translateX(-2px); /* Animasi panah bergeser */
-        }
-
-        /* Media Queries untuk Tombol Kembali (Mobile) */
-        @media (max-width: 480px) {
-            .back-to-index {
-                top: 10px;
-                right: 10px;
-                padding: 6px 10px;
-                font-size: 0.75rem;
-            }
-        }
-
-        /* --- INPUT FIELD DAN FORM (Sisanya sama) --- */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-align: left;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border-light);
-            font-size: 1rem;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.3s;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            background-color: #F9FAFB;
-        }
-
-        input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 202, 255, 0.15);
-            background-color: var(--card-bg);
-        }
-        
-        /* --- GAYA SUGGESTION (DROPDOWN) --- */
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .dropdown-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            box-shadow: var(--shadow-subtle);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 10;
-            display: none;
-            text-align: left;
-            transform-origin: top;
-            animation: dropdownAppear 0.2s ease-out;
-        }
-
-        @keyframes dropdownAppear {
-            from { opacity: 0; transform: scaleY(0.9); }
-            to { opacity: 1; transform: scaleY(1); }
-        }
-
-        .dropdown-list div {
-            padding: 12px 15px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            border-bottom: 1px solid #F3F4F6;
-            transition: background-color 0.2s;
-        }
-
-        .dropdown-list div:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-list div:hover {
-            background: #EBF8FF; 
-            color: var(--primary-dark);
-        }
-
-        /* --- MODE SWITCHER (TABS) --- */
-        .mode-switcher {
-            display: flex;
-            justify-content: space-between;
-            background: #F3F4F6;
-            padding: 5px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .mode-switcher input[type="radio"] {
-            display: none;
-        }
-        .mode-switcher label {
-            flex-grow: 1;
-            padding: 10px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: all 0.3s;
-            text-align: center;
-        }
-        .mode-switcher input[type="radio"]:checked + label {
-            background: var(--primary);
-            color: var(--card-bg);
-            box-shadow: 0 2px 5px rgba(0, 202, 255, 0.3);
-        }
-        
-        /* --- HASIL DAN STATUS --- */
-        .result-container {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            background: #EBF8FF; 
-            border: 1px solid var(--primary);
-            font-weight: 600;
-            color: var(--text-primary);
-            overflow: hidden;
-        }
-        
-        #hasil-text {
-            color: var(--primary-dark); 
-            font-size: 2.2rem;
-            font-weight: 800;
-            display: block;
-            margin-top: 5px;
-        }
-        
-        /* Animasi Pop-Up */
-        @keyframes pop-up {
-            0% { opacity: 0; transform: scale(0.95) translateY(5px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-result {
-            animation: pop-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-        }
-        
-        .info-status {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 15px;
-            padding: 10px;
-            border-top: 1px dashed var(--border-light);
-            line-height: 1.5;
-        }
-        .loading { color: orange; }
-        .success-status { color: var(--primary-dark); font-weight: 600; }
-    </style>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card {
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.25);
+    }
+    .dark .glass-card {
+      background: rgba(30,41,59,.7);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+  </style>
 </head>
-<body>
-    
-    <a href="index.html" class="back-to-index">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Kembali
-    </a>
+<body class="bg-slate-50 text-slate-800 min-h-screen dark:bg-darkBg dark:text-slate-100 pb-20">
+  <div class="max-w-md mx-auto min-h-screen bg-slate-50/60 dark:bg-darkBg border-x border-slate-100 dark:border-slate-800 overflow-hidden">
 
-    <div class="container">
-        <h2>Kalkulator Ongkir</h2>
-
-        <div id="loading-status" class="info-status loading">
-            Menghubungkan ke database...
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 glass-card px-5 py-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl overflow-hidden bg-white shadow-lg ring-2 ring-white/20">
+          <img src="https://uploads.onecompiler.io/43v32m6x5/44rw83fkz/Sahabatku%20(2).png" class="w-full h-full object-cover" alt="Logo">
         </div>
-        
-        <div class="mode-switcher">
-            <input type="radio" id="modeA" name="mode" value="modeA" checked onclick="switchMode('modeA')">
-            <label for="modeA">Cek Ongkir</label>
-            
-            <input type="radio" id="modeB" name="mode" value="modeB" onclick="switchMode('modeB')">
-            <label for="modeB">Hitung Jarak (>12km)</label>
+        <div>
+          <h1 class="text-sm font-bold tracking-tight text-sahabatku">Cek Ongkir</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sahabatku Delivery</p>
+          <a href="index.html" class="inline-flex mt-0.5 text-[10px] font-bold text-sahabatku hover:underline">← Kembali</a>
         </div>
+      </div>
+      <button id="themeToggle" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+        <i class="fa-solid fa-moon dark:hidden"></i>
+        <i class="fa-solid fa-sun hidden dark:block"></i>
+      </button>
+    </header>
 
-        <div id="inputModeA">
-            <label for="asalA">Kota/Wilayah Asal:</label>
-            <input type="text" id="asalA" list="citiesA" oninput="hitungOngkir()" placeholder="Ketik Kota/Wilayah Asal...">
-            
-            <label for="tujuanA">Kota/Wilayah Tujuan:</label>
-            <input type="text" id="tujuanA" list="citiesA" oninput="hitungOngkir()" placeholder="Ketik Kota/Wilayah Tujuan...">
-            <datalist id="citiesA"></datalist>
-        </div>
+    <!-- MAIN CONTENT -->
+    <main class="p-4 space-y-4 pb-24">
 
-        <div id="inputModeB" style="display: none;">
-            
-            <label for="searchTujuanB">Kota/Wilayah Tujuan:</label>
-            <div class="search-box">
-                <input type="text" id="searchTujuanB" oninput="handleInputB(event)" onchange="hitungOngkir()" placeholder="Cari tujuan...">
-                <div class="dropdown-list" id="dropdownB"></div>
+      <!-- TAB SELECTOR -->
+      <div class="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-800 rounded-2xl p-1">
+        <button onclick="switchTab('normal')" id="tab-normal" class="py-3 rounded-xl font-bold text-[10px] uppercase bg-white dark:bg-darkBg text-sahabatku shadow-sm transition-all">
+          <i class="fa-solid fa-road mr-1"></i> Cek Ongkir
+        </button>
+        <button onclick="switchTab('jarak')" id="tab-jarak" class="py-2 rounded-xl font-bold text-[10px] uppercase text-slate-500 dark:text-slate-400 transition-all">
+          <i class="fa-solid fa-ruler mr-1"></i> Hitung Jarak
+        </button>
+        <button onclick="switchTab('3arah')" id="tab-3arah" class="py-2 rounded-xl font-bold text-[10px] uppercase text-slate-500 dark:text-slate-400 transition-all">
+          <i class="fa-solid fa-route mr-1"></i> 3 Arah
+        </button>
+      </div>
+
+      <!-- CEK ONGKIR NORMAL -->
+      <section id="section-normal" class="space-y-4">
+        <div class="glass-card p-4 rounded-2xl space-y-3">
+          <h2 class="font-bold text-sm text-sahabatku flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass"></i> Cek Ongkir Standar
+          </h2>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Asal Wilayah</label>
+            <div class="relative">
+              <input type="text" id="normal-asal" placeholder="Ketik asal wilayah..." 
+                oninput="updateSuggestions('normal','asal')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-normal-asal" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
             </div>
+          </div>
 
-            <label for="jarakB">Jarak (km, diisi jika > 12 km):</label>
-            <input type="number" id="jarakB" min="0" oninput="hitungOngkir()" placeholder="Jarak dalam kilometer (misal: 13)">
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Tujuan Wilayah</label>
+            <div class="relative">
+              <input type="text" id="normal-tujuan" placeholder="Ketik tujuan wilayah..." 
+                oninput="updateSuggestions('normal','tujuan')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-normal-tujuan" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
+            </div>
+          </div>
+
+          <button onclick="hitungNormal()" class="w-full py-3 bg-gradient-to-r from-sahabatku to-blue-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95">
+            <i class="fa-solid fa-calculator mr-2"></i> Hitung Ongkir
+          </button>
+
+          <div id="result-normal" class="hidden p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+            <div class="text-xs text-emerald-600 dark:text-emerald-300 uppercase font-bold">Hasil Estimasi</div>
+            <div class="text-3xl font-black text-emerald-700 dark:text-emerald-200 mt-2" id="display-normal">Rp 0</div>
+          </div>
         </div>
-        
-        <div class="result-container">
-            Perkiraan Biaya Pengiriman:
-            <span id="hasil-text">Rp 0</span>
+      </section>
+
+      <!-- HITUNG JARAK -->
+      <section id="section-jarak" class="hidden space-y-4">
+        <div class="glass-card p-4 rounded-2xl space-y-3">
+          <h2 class="font-bold text-sm text-sahabatku flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot"></i> Hitung Berdasarkan Jarak
+          </h2>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Wilayah / Asal</label>
+            <div class="relative">
+              <input type="text" id="jarak-wilayah" placeholder="Ketik wilayah asal..." 
+                oninput="updateSuggestions('jarak','wilayah')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-jarak-wilayah" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Jarak (KM)</label>
+            <input type="number" id="jarak-km" placeholder="Contoh: 13" step="0.5" min="0"
+              class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+          </div>
+
+          <div class="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-[10px] text-blue-700 dark:text-blue-300">
+            <i class="fa-solid fa-info-circle mr-1"></i> Rumus: (Jarak × 2 × 1.000) + 2.000 + Tarif Base
+          </div>
+
+          <button onclick="hitungJarak()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95">
+            <i class="fa-solid fa-calculator mr-2"></i> Hitung Jarak
+          </button>
+
+          <div id="result-jarak" class="hidden p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800">
+            <div class="text-xs text-indigo-600 dark:text-indigo-300 uppercase font-bold">Hasil Hitung Jarak</div>
+            <div class="text-3xl font-black text-indigo-700 dark:text-indigo-200 mt-2" id="display-jarak">Rp 0</div>
+          </div>
         </div>
-        
-        <div id="formula-info" class="info-status">
-            Pilih mode perhitungan di atas.
+      </section>
+
+      <!-- 3 ARAH -->
+      <section id="section-3arah" class="hidden space-y-4">
+        <div class="glass-card p-4 rounded-2xl space-y-3">
+          <h2 class="font-bold text-sm text-sahabatku flex items-center gap-2">
+            <i class="fa-solid fa-route"></i> Cek Ongkir 3 Arah
+          </h2>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Asal</label>
+            <div class="relative">
+              <input type="text" id="3arah-asal" placeholder="Ketik asal..." 
+                oninput="updateSuggestions('3arah','asal')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-3arah-asal" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="flex items-center justify-center h-8">
+              <div class="flex-1 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
+              <i class="fa-solid fa-arrow-down text-slate-400 mx-2"></i>
+              <div class="flex-1 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Titik Tengah (Checkpoint)</label>
+            <div class="relative">
+              <input type="text" id="3arah-titik" placeholder="Ketik titik tengah..." 
+                oninput="updateSuggestions('3arah','titik')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-3arah-titik" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="flex items-center justify-center h-8">
+              <div class="flex-1 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
+              <i class="fa-solid fa-arrow-down text-slate-400 mx-2"></i>
+              <div class="flex-1 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1.5">Tujuan Akhir</label>
+            <div class="relative">
+              <input type="text" id="3arah-tujuan" placeholder="Ketik tujuan akhir..." 
+                oninput="updateSuggestions('3arah','tujuan')"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sahabatku">
+              <div id="suggest-3arah-tujuan" class="hidden absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-800 border rounded-2xl shadow-lg max-h-40 overflow-y-auto z-20"></div>
+            </div>
+          </div>
+
+          <button onclick="hitung3Arah()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95">
+            <i class="fa-solid fa-calculator mr-2"></i> Hitung 3 Arah
+          </button>
+
+          <div id="result-3arah" class="hidden p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <div class="text-xs text-amber-600 dark:text-amber-300 uppercase font-bold">Hasil Estimasi 3 Arah</div>
+            <div class="text-3xl font-black text-amber-700 dark:text-amber-200 mt-2" id="display-3arah">Rp 0</div>
+          </div>
         </div>
-    </div>
+      </section>
 
-    <script>
-        // ------------------------------------------------------------------
-        // 1. KONFIGURASI FIREBASE ANDA
-        // ------------------------------------------------------------------
-        const firebaseConfig = {
-          apiKey: "AIzaSyCtva8TeL40-WotK4kFL_vL8uUXL3GDfww",
-          authDomain: "sahabatkuu-bisa.firebaseapp.com",
-          databaseURL: "https://sahabatkuu-bisa-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "sahabatkuu-bisa",
-          storageBucket: "sahabatkuu-bisa.firebasestorage.app",
-          messagingSenderId: "315555564115",
-          appId: "1:315555564115:web:56f46dbceb8c154589d4a6",
-          measurementId: "G-PFGYL96VPS"
-        };
+    </main>
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        let realTimeOngkir = {}; 
-        const DISKON = 6000;
-        let selectedTujuanB = null; 
+  </div>
 
-        // Elemen DOM
-        const loadingStatus = document.getElementById('loading-status');
-        const hasilText = document.getElementById("hasil-text");
-        const formulaInfo = document.getElementById("formula-info");
-        const searchInputB = document.getElementById("searchTujuanB");
-        const dropdownB = document.getElementById("dropdownB");
-        const jarakInputB = document.getElementById("jarakB");
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Formatter Rupiah
-        const formatRupiah = (angka) => `Rp ${Math.max(0, angka).toLocaleString('id-ID')}`;
-        
-        // Helper untuk animasi
-        function animateResult(ongkir) {
-            hasilText.classList.remove('animate-result');
-            void hasilText.offsetWidth; // Force reflow
-            hasilText.innerHTML = formatRupiah(ongkir);
-            hasilText.classList.add('animate-result');
+    const firebaseConfig = {
+      apiKey: "AIzaSyDweL8xXcOu6ZODYzCa1KpqZVPLH5Ocijk",
+      authDomain: "aplikasi-sahabatkugroup.firebaseapp.com",
+      databaseURL: "https://aplikasi-sahabatkugroup-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "aplikasi-sahabatkugroup",
+      storageBucket: "aplikasi-sahabatkugroup.firebasestorage.app",
+      messagingSenderId: "323288632862",
+      appId: "1:323288632862:web:57f12fbb5b18ad0fbd680f",
+      measurementId: "G-788RL05MFR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let DATA_ONGKIR = {};
+
+    // Load data ongkir
+    onValue(ref(db, 'ongkir_wilayah'), (snap) => {
+      DATA_ONGKIR = snap.val() || {};
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.toggle('dark', systemDark);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    window.switchTab = function(tab) {
+      ['normal', 'jarak', '3arah'].forEach(t => {
+        document.getElementById(`section-${t}`).classList.toggle('hidden', t !== tab);
+        document.getElementById(`tab-${t}`).classList.toggle('bg-white', t === tab);
+        document.getElementById(`tab-${t}`).classList.toggle('dark:bg-darkBg', t === tab);
+        document.getElementById(`tab-${t}`).classList.toggle('text-sahabatku', t === tab);
+        document.getElementById(`tab-${t}`).classList.toggle('shadow-sm', t === tab);
+        document.getElementById(`tab-${t}`).classList.toggle('text-slate-500', t !== tab);
+        document.getElementById(`tab-${t}`).classList.toggle('dark:text-slate-400', t !== tab);
+      });
+    };
+
+    function normalizeNama(text) {
+      return (text || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function cariTarif(nama) {
+      const target = normalizeNama(nama);
+      for (let k in DATA_ONGKIR) {
+        const item = DATA_ONGKIR[k];
+        if (item && normalizeNama(item.wilayah) === target) {
+          return parseInt(item.tarif) || 0;
         }
+      }
+      return 0;
+    }
 
-        // ------------------------------------------------------------------
-        // 2. FUNGSI PENGAMBIL DATA DARI FIREBASE
-        // ------------------------------------------------------------------
-        function fetchOngkirData() {
-            loadingStatus.textContent = 'Menghubungkan ke database...';
+    window.updateSuggestions = function(mode, type) {
+      const inputId = `${mode}-${type}`;
+      const suggestId = `suggest-${mode}-${type}`;
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(suggestId);
+      if (!input || !box) return;
 
-            database.ref('daftar_ongkir').once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        let fetchedData = {};
-                        snapshot.forEach((childSnapshot) => {
-                            const item = childSnapshot.val();
-                            if (item.wilayah && typeof item.ongkir === 'number') {
-                                fetchedData[item.wilayah.toUpperCase()] = item.ongkir; 
-                            }
-                        });
+      const q = normalizeNama(input.value);
+      if (!q) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
 
-                        realTimeOngkir = fetchedData;
-                        populateCitiesA(); 
-                        hitungOngkir();
-                        
-                        loadingStatus.textContent = 'Data tarif berhasil dimuat.';
-                        loadingStatus.classList.remove('loading');
-                        loadingStatus.classList.add('success-status');
+      const matches = [];
+      for (let k in DATA_ONGKIR) {
+        const item = DATA_ONGKIR[k];
+        if (item && normalizeNama(item.wilayah).includes(q)) {
+          matches.push(item.wilayah);
+        }
+      }
 
-                    } else {
-                        loadingStatus.textContent = 'Error: Data ongkir (/daftar_ongkir) tidak ditemukan.';
-                        loadingStatus.style.color = 'red';
-                    }
-                })
-                .catch((error) => {
-                    console.error("Firebase fetch error:", error);
-                    loadingStatus.textContent = `Error koneksi: ${error.message}`;
-                    loadingStatus.style.color = 'red';
-                });
+      if (!matches.length) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+
+      box.innerHTML = matches.slice(0, 8).map(nama => `
+        <div onclick="pilihSuggestion('${mode}','${type}','${nama.replace(/'/g, "\\'")}')"
+          class="px-4 py-2.5 text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-0">
+          <i class="fa-solid fa-location-dot text-slate-400 mr-2"></i>${nama}
+        </div>
+      `).join('');
+
+      box.classList.remove('hidden');
+    };
+
+    window.pilihSuggestion = function(mode, type, nama) {
+      const inputId = `${mode}-${type}`;
+      const suggestId = `suggest-${mode}-${type}`;
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(suggestId);
+      if (input) input.value = nama;
+      if (box) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+      }
+    };
+
+    window.hitungNormal = function() {
+      const asal = document.getElementById('normal-asal').value.trim();
+      const tujuan = document.getElementById('normal-tujuan').value.trim();
+
+      if (!asal && !tujuan) {
+        alert('Isi minimal salah satu: asal atau tujuan.');
+        return;
+      }
+
+      const tarifAsal = asal ? cariTarif(asal) : 0;
+      const tarifTujuan = tujuan ? cariTarif(tujuan) : 0;
+
+      let hasil = 0;
+      if (asal && tujuan) hasil = tarifAsal + tarifTujuan - 6000;
+      else if (asal) hasil = tarifAsal;
+      else hasil = tarifTujuan;
+
+      hasil = Math.max(0, hasil);
+
+      document.getElementById('display-normal').textContent = 'Rp ' + hasil.toLocaleString('id-ID');
+      document.getElementById('result-normal').classList.remove('hidden');
+    };
+    window.hitungJarak = function() {
+      const wilayah = document.getElementById('jarak-wilayah').value.trim();
+      const km = parseFloat(document.getElementById('jarak-km').value) || 0;
+
+      if (!wilayah || km <= 0) {
+        alert('Isi wilayah dan jarak dengan benar.');
+        return;
+      }
+
+      let hasil = 0;
+      let info = '';
+
+      if (km <= 12) {
+        info = `<div class="text-[10px] text-amber-600 dark:text-amber-300">⚠️ Jarak ≤ 12km. Gunakan "Cek Ongkir" normal untuk hasil akurat.</div>`;
+        const resultElement = document.getElementById('result-jarak');
+        if (resultElement) {
+          resultElement.innerHTML = `
+            <div class="text-xs text-amber-600 dark:text-amber-300 uppercase font-bold">Informasi</div>
+            ${info}
+          `;
+          resultElement.classList.remove('hidden');
+        }
+      } else {
+        const tarifWilayah = cariTarif(wilayah);
+        hasil = (km * 2000) + 5000 + tarifWilayah;
+        
+        const displayElement = document.getElementById('display-jarak');
+        const resultElement = document.getElementById('result-jarak');
+        
+        if (displayElement) {
+          displayElement.textContent = 'Rp ' + Math.round(hasil).toLocaleString('id-ID');
         }
         
-        // ------------------------------------------------------------------
-        // 3. FUNGSI UTILITY (Mode A: Datalist)
-        // ------------------------------------------------------------------
-        function populateCitiesA() {
-            const datalist = document.getElementById('citiesA');
-            datalist.innerHTML = ''; 
-            const cities = Object.keys(realTimeOngkir).filter(key => key !== ''); 
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city; 
-                datalist.appendChild(option);
-            });
+        if (resultElement) {
+          info = `<div class="text-[10px] text-indigo-600 dark:text-indigo-300 mt-2">Rumus: (${km} × 2000) + 5000 + ${tarifWilayah.toLocaleString('id-ID')} = <b>Rp ${Math.round(hasil).toLocaleString('id-ID')}</b></div>`;
+          resultElement.innerHTML = `
+            <div class="text-xs text-indigo-600 dark:text-indigo-300 uppercase font-bold">Hasil Hitung Jarak</div>
+            <div class="text-3xl font-black text-indigo-700 dark:text-indigo-200 mt-2">Rp ${Math.round(hasil).toLocaleString('id-ID')}</div>
+            ${info}
+          `;
+          resultElement.classList.remove('hidden');
         }
-        
-        // ------------------------------------------------------------------
-        // 4. FUNGSI MODE SWITCHER
-        // ------------------------------------------------------------------
-        function switchMode(mode) {
-            document.getElementById('inputModeA').style.display = (mode === 'modeA' ? 'block' : 'none');
-            document.getElementById('inputModeB').style.display = (mode === 'modeB' ? 'block' : 'none');
-            // Reset hasil saat ganti mode
-            animateResult(0);
-            formulaInfo.innerHTML = 'Silakan masukkan data perhitungan.';
-            hitungOngkir();
-        }
+      }
+    };
 
-        // ------------------------------------------------------------------
-        // 5. LOGIKA PENCARIAN & PERHITUNGAN KHUSUS MODE B
-        // ------------------------------------------------------------------
-        function handleInputB(event) {
-            const val = event.target.value.toUpperCase();
-            dropdownB.innerHTML = "";
-            
-            if (val.length < 2 || Object.keys(realTimeOngkir).length === 0) { 
-                dropdownB.style.display = "none";
-                hitungOngkir(); 
-                return;
-            }
-            
-            const cityArray = Object.keys(realTimeOngkir).map(wilayah => ({
-                lokasi: wilayah,
-                ongkir: realTimeOngkir[wilayah]
-            }));
-            const filtered = cityArray.filter(item => item.lokasi.includes(val));
-            
-            if (filtered.length > 0) {
-                dropdownB.style.display = "block";
-                filtered.forEach(item => {
-                    const div = document.createElement("div");
-                    div.textContent = item.lokasi;
-                    div.onclick = () => {
-                        searchInputB.value = item.lokasi;
-                        selectedTujuanB = item; 
-                        dropdownB.style.display = "none";
-                        hitungOngkir();
-                    };
-                    dropdownB.appendChild(div);
-                });
-            } else {
-                dropdownB.style.display = "none";
-            }
-        }
-        
-        searchInputB.addEventListener("input", handleInputB);
 
-        // Sembunyikan dropdown saat klik di luar area
-        document.addEventListener('click', (e) => {
-            if (!dropdownB.contains(e.target) && e.target !== searchInputB) {
-                dropdownB.style.display = 'none';
-            }
+    window.hitung3Arah = function() {
+      const asal = document.getElementById('3arah-asal').value.trim();
+      const titik = document.getElementById('3arah-titik').value.trim();
+      const tujuan = document.getElementById('3arah-tujuan').value.trim();
+
+      if (!asal || !titik || !tujuan) {
+        alert('Lengkapi semua kolom: asal, titik tengah, dan tujuan.');
+        return;
+      }
+
+      const tarifAsal = cariTarif(asal);
+      const tarifTitik = cariTarif(titik);
+      const tarifTujuan = cariTarif(tujuan);
+
+      const hasil = Math.max(0, tarifAsal + tarifTitik - 6000 + tarifTujuan);
+
+      document.getElementById('display-3arah').textContent = 'Rp ' + hasil.toLocaleString('id-ID');
+      document.getElementById('result-3arah').classList.remove('hidden');
+    };
+
+    // Click outside suggestions
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('input')) {
+        document.querySelectorAll('[id^="suggest-"]').forEach(box => {
+          box.classList.add('hidden');
+          box.innerHTML = '';
         });
-
-
-        // ------------------------------------------------------------------
-        // 6. FUNGSI PERHITUNGAN UTAMA (Main Handler)
-        // ------------------------------------------------------------------
-        function hitungOngkir() {
-            const currentMode = document.querySelector('input[name="mode"]:checked').value;
-            let finalOngkir = 0;
-            let infoText = '';
-
-            if (currentMode === 'modeA') {
-                ({ ongkir: finalOngkir, infoText: infoText } = calculateModeA());
-            } else { // modeB
-                ({ ongkir: finalOngkir, infoText: infoText } = calculateModeB());
-            }
-
-            animateResult(finalOngkir);
-            formulaInfo.innerHTML = infoText;
-        }
-
-        // ------------------------------------------------------------------
-        // 7. CALCULATION LOGIC A (Asal & Tujuan)
-        // ------------------------------------------------------------------
-        function calculateModeA() {
-            const asal = document.getElementById('asalA').value.toUpperCase();
-            const tujuan = document.getElementById('tujuanA').value.toUpperCase();
-            let ongkir = 0;
-            let info = 'Pilih Kota Asal dan/atau Kota Tujuan.';
-
-            const ongkirAsal = realTimeOngkir[asal] || 0;
-            const ongkirTujuan = realTimeOngkir[tujuan] || 0;
-
-            if (asal && tujuan) {
-                if (asal === tujuan) {
-                    ongkir = ongkirAsal;
-                    info = `**${asal}** -> **${tujuan}**: Harga dasar **${formatRupiah(ongkirAsal)}** diterapkan (karena kota sama).`;
-                } else {
-                    ongkir = ongkirAsal + ongkirTujuan - DISKON;
-                    info = `Rumus: **${formatRupiah(ongkirAsal)}** (Asal) + **${formatRupiah(ongkirTujuan)}** (Tujuan) - **${formatRupiah(DISKON)}** (Diskon).`;
-                }
-            } else if (asal || tujuan) {
-                ongkir = ongkirAsal || ongkirTujuan;
-                const kotaDipilih = asal || tujuan;
-                const hargaDipilih = ongkirAsal || ongkirTujuan;
-                info = `Hanya **${kotaDipilih}** yang diisi. Biaya dasarnya: **${formatRupiah(hargaDipilih)}**.`;
-            }
-            
-            if (ongkir < 0) {
-                 ongkir = 0;
-                 info += ' (Hasil negatif dibulatkan menjadi Rp 0)';
-            }
-
-            return { ongkir, infoText: info };
-        }
-        
-        // ------------------------------------------------------------------
-        // 8. CALCULATION LOGIC B (Jarak > 12km)
-        // ------------------------------------------------------------------
-        function calculateModeB() {
-            const jarak = parseFloat(jarakInputB.value);
-            let ongkir = 0;
-            let info = 'Pilih tujuan dan masukkan jarak.';
-
-            // Pastikan selectedTujuanB up-to-date
-            const lokasiKey = searchInputB.value.toUpperCase();
-            if (realTimeOngkir[lokasiKey] !== undefined) {
-                selectedTujuanB = { lokasi: lokasiKey, ongkir: realTimeOngkir[lokasiKey] };
-            } else if (searchInputB.value.trim() !== "") {
-                 selectedTujuanB = null; // Reset jika input tidak valid
-            }
-
-            if (selectedTujuanB) {
-                let baseOngkir = selectedTujuanB.ongkir;
-                ongkir = baseOngkir;
-                info = `Harga dasar **${selectedTujuanB.lokasi}**: ${formatRupiah(baseOngkir)}.`;
-                
-                if (!isNaN(jarak) && jarak > 12) {
-                    // RUMUS KHUSUS JARAK: 6000 + ((Jarak - 5) * 2000) + 6000
-                    const jarakHitung = Math.max(0, jarak - 5); 
-                    let ongkirExtra = 6000 + (jarakHitung * 2000) + 6000;
-                    
-                    ongkir += ongkirExtra;
-                    
-                    info = `**${selectedTujuanB.lokasi} (Jarak ${jarak} km)**: Dasar ${formatRupiah(baseOngkir)} + Tambahan Jarak ${formatRupiah(ongkirExtra)}.`;
-
-                } else if (!isNaN(jarak) && jarak > 0 && jarak <= 12) {
-                    info += ` Jarak ${jarak} km termasuk dalam harga dasar.`;
-                }
-            } else if (searchInputB.value.trim() !== "") {
-                info = 'Lokasi tujuan tidak ditemukan dalam database.';
-            } else {
-                 info = 'Masukkan Kota/Wilayah Tujuan.';
-            }
-
-            return { ongkir, infoText: info };
-        }
-
-        // ------------------------------------------------------------------
-        // 9. INISIALISASI
-        // ------------------------------------------------------------------
-        window.onload = function() {
-            fetchOngkirData(); 
-            // Inisialisasi mode default saat halaman dimuat
-            switchMode('modeA'); 
-        };
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
