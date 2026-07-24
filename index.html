@@ -420,8 +420,7 @@
       const tarifTitik = cariTarif(titik);
       const tarifTujuan = cariTarif(tujuan);
 
-      const hasil = Math.max(0, tarifAsal + tarifTitik - 6000 + tarifTujuan);
-
+      const hasil = Math.max(0, tarifAsal + tarifTitik - 6000 + tarifTujuan - 3000);
       document.getElementById('display-3arah').textContent = 'Rp ' + hasil.toLocaleString('id-ID');
       document.getElementById('result-3arah').classList.remove('hidden');
     };
